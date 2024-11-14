@@ -1,0 +1,230 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to represent a school
+typedef struct School {
+    int ID;
+    int univ_id;
+    char sch_code[50];
+    char sch_name[100];
+    char sch_location[100];
+    char sch_email[100];
+} School;
+
+// Function to create a new school
+School* createSchool(int ID, int univ_id, const char* sch_code, const char* sch_name, const char* sch_location, const char* sch_email) {
+    School* school = (School*) malloc(sizeof(School));
+    if (school == NULL) {
+        fprintf(stderr, "Memory allocation failed
+");
+        exit(1);
+    }
+    school->ID = ID;
+    school->univ_id = univ_id;
+    strcpy(school->sch_code, sch_code);
+    strcpy(school->sch_name, sch_name);
+    strcpy(school->sch_location, sch_location);
+    strcpy(school->sch_email, sch_email);
+    return school;
+}
+
+// Function to display a school
+void displaySchool(const School* school) {
+    printf("ID: %d
+", school->ID);
+    printf("Univ ID: %d
+", school->univ_id);
+    printf("School Code: %s
+", school->sch_code);
+    printf("School Name: %s
+", school->sch_name);
+    printf("School Location: %s
+", school->sch_location);
+    printf("School Email: %s
+", school->sch_email);
+    printf("
+");
+}
+
+// Insertion sort function
+void insertionSort(School** schools, int num_schools) {
+    for (int i = 1; i < num_schools; i++) {
+        School* key = schools[i];
+        int j = i - 1;
+
+        // Move elements of schools[0..i-1] that are greater than key
+        // to one position ahead of their current position
+        while (j >= 0 && schools[j]->ID > key->ID) {
+            schools[j + 1] = schools[j];
+            j--;
+        }
+        schools[j + 1] = key;
+    }
+}
+
+// Merge function for merge sort
+void merge(School** schools, int left, int mid, int right) {
+    int i, j, k;
+    int n1 = mid - left + 1; // Size of left subarray
+    int n2 = right - mid; // Size of right subarray
+
+    // Create temporary arrays
+    School** L = (School*)malloc(n1 * sizeof(School));
+    School** R = (School*)malloc(n2 * sizeof(School));
+
+    // Copy data to temporary arrays
+    for (i = 0; i < n1; i++)
+        L[i] = schools[left + i];
+    
+    for (j = 0; j < n2; j++)
+        R[j] = schools[mid + 1 + j];
+
+    // Merge the temporary arrays back into schools[left..right]
+    i = 0; // Initial index of first subarray
+    j = 0; // Initial index of second subarray
+    k = left; // Initial index of merged subarray
+
+    while (i < n1 && j < n2) {
+        if (L[i]->ID <= R[j]->ID) {
+            schools[k] = L[i];
+            i++;
+        } else {
+            schools[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    // Copy the remaining elements of L[], if there are any
+    while (i < n1) {
+        schools[k] = L[i];
+        i++;
+        k++;
+    }
+
+    // Copy the remaining elements of R[], if there are any
+    while (j < n2) {
+        schools[k] = R[j];
+        j++;
+        k++;
+    }
+
+    // Free temporary arrays
+    free(L);
+    free(R);
+}
+
+// Merge sort function
+void mergeSort(School** schools, int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+
+        // Sort first and second halves
+        mergeSort(schools, left, mid);
+        mergeSort(schools, mid + 1, right);
+
+        // Merge the sorted halves
+        merge(schools, left, mid, right);
+   }
+}
+
+// Linear search function
+School* linearSearch(School** schools, int num_schools, int searchID) {
+   for (int i = 0; i < num_schools; i++) {
+       if (schools[i]->ID == searchID) {
+           return schools[i]; // Return the found school 
+       }
+   }
+   return NULL; // Return NULL if not found 
+}
+
+// Binary search function
+School* binarySearch(School** schools, int num_schools, int searchID) {
+   int left = 0; 
+   int right = num_schools - 1; 
+   while (left <= right) { 
+       int mid = left + (right - left) / 2;
+       if (schools[mid]->ID == searchID) { 
+           return schools[mid]; // Return the found school
+       }
+       if (schools[mid]->ID < searchID) {
+           left = mid + 1; // Search in the right half
+       } else {
+           right = mid - 1; // Search in the left half
+       }
+   }
+   return NULL; // Return NULL if not found 
+}
+
+int main() {
+   // Create some schools in an unsorted order for demonstration purposes
+   School* schools[] = {
+       createSchool(1, 102, "S001", "Happy Valley International School", "Agiripally", "Happyvalley@gmail.com"),
+       createSchool(4, 103, "S004", "Bluebells International School", "Delhi", "Delhi123@gmail.com"),
+       createSchool(2, 104, "S002", "Wise Woods", "Gudivada", "wisewoods123@gmail.com"),
+       createSchool(7, 107, "S007", "Dhirubhai Ambani International School", "Mumbai", "ambani123@gmail.com"),
+       createSchool(9, 109, "S009", "Oberoi International School", "Mumbai", "oberoi789@gmail.com"),
+        createSchool(3, 103, "S003", "Pathway School", "Noida ", "pathwaynodia@gmail.com"),
+         createSchool(5, 105, "S005", "Heritage learning  School", "Gurugram","heritage1@gmail.com"),
+        createSchool(8, 108, "S008", "Sherwood School", "Naintal “,”osco@gmail.com"),
+         createSchool(10, 110, "S010", "Lawence School", "Ooty", "lawence789@gmail.com"),
+        createSchool(6, 101, "S006", "DPS", "Vijayawada", "DPS1@gmail.com"),
+
+   };
+
+   int num_schools = sizeof(schools) / sizeof(schools[0]);
+
+   // Sort schools using Insertion Sort
+   insertionSort(schools, num_schools);
+
+   // Display all sorted schools using Insertion Sort
+   printf("Sorted Schools using Insertion Sort:
+");
+   for (int i = 0; i < num_schools; i++) {
+       displaySchool(schools[i]);
+   }
+
+   // Sort again using Merge Sort for demonstration purposes
+   mergeSort(schools, 0, num_schools - 1);
+
+   // Display all sorted schools using Merge Sort
+   printf("Sorted Schools using Merge Sort:
+");
+   for (int i = 0; i < num_schools; i++) {
+       displaySchool(schools[i]);
+   }
+
+   // Search for a specific school by ID using Linear Search
+   int searchIDLinear = 3; // Example search ID for linear search
+   School* foundSchoolLinear = linearSearch(schools, num_schools, searchIDLinear);
+
+   if (foundSchoolLinear != NULL) {
+       printf("Found School using Linear Search:
+");
+       displaySchool(foundSchoolLinear);
+   } else {
+       printf("No school found with ID: %d using Linear Search
+", searchIDLinear);
+   }
+
+   // Search for a specific school by ID using Binary Search
+   int searchIDBinary = 6; // Example search ID for binary search
+   School* foundSchoolBinary = binarySearch(schools, num_schools, searchIDBinary);
+
+   if (foundSchoolBinary != NULL) {
+       printf("Found School using Binary Search:
+");
+       displaySchool(foundSchoolBinary);
+   } else {
+       printf("No school found with ID: %d using Binary Search
+", searchIDBinary);
+   }
+
+   // Free the memory allocated for the schools
+   for (int i = 0; i < num_schools; i++) {
+       free(schools[i]);
+   }
+
+   return 0;
+}
